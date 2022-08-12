@@ -1,19 +1,28 @@
-const app = require("express")();
-const server = require("http").Server(app);
-const io = require("socket.io")(server);
+require("dotenv/config");
 
-io.on("connection", (client) => {
-  client.on("event", (data) => {
-    console.log("event");
-  });
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 
-  client.on("disconnect", () => {
-    console.log("disconnect");
-  });
-});
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+const PORT = process.env.PORT || 3000;
+
+
 
 app.get("/", (req, res) => {
-  console.log("ddd");
+  res.sendFile(__dirname + "/index.html");
 });
 
-server.listen(3000);
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server been started on port: ${PORT}`);
+});
